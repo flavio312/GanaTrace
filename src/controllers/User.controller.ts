@@ -29,7 +29,7 @@ export const getUserId = async (req: Request, res: Response) => {
 
 // Crear usuario
 export const createUser = async (req: Request, res: Response): Promise<any> => {
-    const { name, email, password, rol } = req.body;
+    const { name, lastname, document, numberDocument, birthdate, phone, email, password, role } = req.body;
 
     try {
         const saltRounds = 10;
@@ -41,15 +41,15 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
         }
 
         const [result]: any = await database.query(
-            'INSERT INTO users (name, email, password, rol) VALUES (?, ?, ?, ?)',
-            [name, email, hashedPassword, rol]
+            'INSERT INTO users (name, lastname, document, numberDocument, birthdate, phone, email, password, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )',
+            [name, lastname, document, numberDocument, birthdate, phone, email, hashedPassword, role]
         );
 
-        const token = jwt.sign({ idUsers: result.insertId, email, rol }, secretKey, {
+        const token = jwt.sign({ idUsers: result.insertId, email, role }, secretKey, {
             expiresIn: '1h'
         });
-        console.log("Usuario creado correctamente:", { idUsers: result.insertId, name, email, rol });
-        res.status(201).json({ idUsers: result.insertId, name, email, rol, token });
+        console.log("Usuario creado correctamente:", { idUsers: result.insertId, name, email, role });
+        res.status(201).json({ idUsers: result.insertId, name, email, role, token });
     } catch (error) {
         console.error("Error al crear el usuario:", error);
         res.status(500).json({ message: "Error al crear el usuario" });
@@ -58,12 +58,12 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
 
 // Actualizar usuario
 export const updateUser = async (req: Request, res: Response): Promise<any> => {
-    const { name, email, password, rol } = req.body;
+    const {name,lastname, document, numberDocument, birthdate, phone, email, password, role} = req.body;
     const { idUsers } = req.params;
 
     try {
-        let query = 'UPDATE users SET name = ?, email = ?, rol = ?';
-        const params: any[] = [name, email, rol];
+        let query = 'UPDATE users SET name = ?, lastname = ?, document =?, numberDocument =?, birthdate = ?, phone = ?, email = ?, rol = ?';
+        const params: any[] = [name,lastname, document, numberDocument, birthdate, phone, email, password, role];
 
         if (password) {
             const saltRounds = 10;
@@ -80,7 +80,7 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-        console.log("Usuario actualizado correctamente:", { idUsers, name, email, rol });
+        console.log("Usuario actualizado correctamente:", { idUsers, name, email, role });
         res.json({ message: 'User updated successfully' });
     } catch (error) {
         console.error("Error al actualizar el usuario:", error);

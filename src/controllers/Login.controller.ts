@@ -49,7 +49,7 @@ export const recupContraseña = async (req: Request, res: Response): Promise<any
         if (!email || !email.trim()) {
             return res.status(400).json({ message: 'El email es requerido' });
         }
-
+        console.log("Recuperación de contraseña solicitada para el email:", email);
         const [rows] = await database.query('SELECT * FROM users WHERE email = ?', [email]);
         const users = (rows as any[])[0];
 
@@ -66,8 +66,7 @@ export const recupContraseña = async (req: Request, res: Response): Promise<any
             [hashedToken, tokenExpiry, users.idUsers]
         );
 
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
+        const resetUrl = `${process.env.FRONTEND_URL || ''}/reset-password?token=${resetToken}`;
 
         // Configurar el correo con HTML
         const mailOptions = {
