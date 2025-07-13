@@ -73,7 +73,7 @@ src/
 
 - **Node.js** + **TypeScript**
 - **Express** para construir la API
-- **MongoDB** (o base de datos equivalente)
+- **MySql** Base de dtos relacional
 - **JWT** para autenticación
 - **Nodemailer** para recuperación de contraseña
 - **Dotenv** para gestión de variables de entorno
@@ -87,7 +87,7 @@ src/
    ```bash
    npm install
    ```
-3. Configurar variables de entorno en `.env`.
+3. Crear y configurar variables de entorno en `.env`.
 4. Levantar el servidor:
    ```bash
    npm run dev
