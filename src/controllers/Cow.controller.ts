@@ -35,26 +35,26 @@ export const getCowId = async (req: Request, res: Response): Promise<any> => {
 
 // Crear una nueva vaca asociada al usuario autenticado
 export const createCow = async (req: Request, res: Response): Promise<any> => {
-    const { raza, edad, peso, precio, vacunacion, descripcion, imagen } = req.body;
+    const { race, age, weight, price, vaccination, description, image, dateRegister } = req.body;
     const idUsers = req.user?.idUsers;
 
     try {
         const [result]: any = await database.query(
-            'INSERT INTO cows (idUsers, raza, edad, peso, precio, vacunacion, descripcion, imagen, fechaRegistro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURDATE())',
-            [idUsers, raza, edad, peso, precio, vacunacion, descripcion, imagen]
+            'INSERT INTO cows (idUsers, race, age, weight, price, vaccination, description, image, dateRegister) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE())',
+            [idUsers,race, age, weight, price, vaccination, description, image, dateRegister]
         );
 
         res.status(201).json({
             idCows: result.insertId,
             idUsers,
-            raza,
-            edad,
-            peso,
-            precio,
-            vacunacion,
-            descripcion,
-            imagen,
-            fechaRegistro: new Date().toISOString().split('T')[0]
+            race, 
+            age, 
+            weight, 
+            price, 
+            vaccination, 
+            description, 
+            image, 
+            dateRegister: new Date().toISOString().split('T')[0]
         });
         console.log("Vaca creada correctamente");
     } catch (error) {
@@ -66,7 +66,7 @@ export const createCow = async (req: Request, res: Response): Promise<any> => {
 // Actualizar una vaca (solo si pertenece al usuario)
 export const updateCow = async (req: Request, res: Response): Promise<any> => {
     const { idCows } = req.params;
-    const { raza, edad, peso, precio, vacunacion, descripcion, imagen } = req.body;
+    const {race, age, weight, price, vaccination, description, image, dateRegister} = req.body;
     const idUsers = req.user?.idUsers;
 
     try {
@@ -76,8 +76,8 @@ export const updateCow = async (req: Request, res: Response): Promise<any> => {
         }
 
         const [result]: any = await database.query(
-            'UPDATE cows SET raza = ?, edad = ?, peso = ?, precio = ?, vacunacion = ?, descripcion = ?, imagen = ? WHERE idCows = ?',
-            [raza, edad, peso, precio, vacunacion, descripcion, imagen, idCows]
+            'UPDATE cows SET race = ?, age = ?, weight = ?, price = ?, vaccination = ?, description = ?, image = ?, dateRegister = ? WHERE idCows = ?',
+            [race, age, weight, price, vaccination, description, image, dateRegister, idCows]
         );
         console.log("Vaca actualizada correctamente");
         res.json({ message: 'Vaca actualizada correctamente' });

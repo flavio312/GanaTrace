@@ -49,7 +49,7 @@ export const recupContraseña = async (req: Request, res: Response): Promise<any
         if (!email || !email.trim()) {
             return res.status(400).json({ message: 'El email es requerido' });
         }
-
+        console.log("Recuperación de contraseña solicitada para el email:", email);
         const [rows] = await database.query('SELECT * FROM users WHERE email = ?', [email]);
         const users = (rows as any[])[0];
 
@@ -66,12 +66,10 @@ export const recupContraseña = async (req: Request, res: Response): Promise<any
             [hashedToken, tokenExpiry, users.idUsers]
         );
 
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://127.0.0.1:5500'}/reset-password.html?token=${resetToken}`;
 
-
-        // Configurar el correo con HTML
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
+        // Usar tu servicio de email con la estructura correcta
+        await sendEmail({
             to: users.email,
             subject: 'Recuperación de contraseña',
             html: `
@@ -84,9 +82,7 @@ export const recupContraseña = async (req: Request, res: Response): Promise<any
                 <p>Saludos,<br>El equipo de soporte</p>
             `,
             text: `Hola ${users.name}, has solicitado restablecer tu contraseña. Visita el siguiente enlace: ${resetUrl}. El enlace expirará en 1 hora.`
-        };
-        
-        await sendEmail(mailOptions);
+        });
 
         res.json({ message: 'Correo de recuperación enviado exitosamente' });
     } catch (error) {
@@ -153,16 +149,8 @@ export const restablecerContraseña = async (req: Request, res: Response): Promi
             [hashedPassword, user.idUsers]
         );
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER || '',
-                pass: process.env.EMAIL_PASSWORD || '',
-            },
-        });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
+        // Usar tu servicio de email existente con la estructura correcta
+        await sendEmail({
             to: user.email,
             subject: 'Contraseña restablecida exitosamente',
             html: `
@@ -171,10 +159,8 @@ export const restablecerContraseña = async (req: Request, res: Response): Promi
                 <p>Tu contraseña ha sido restablecida exitosamente.</p>
                 <p>Si no realizaste este cambio, contacta inmediatamente con soporte.</p>
                 <p>Saludos,<br>El equipo de soporte</p>
-            `,
-        };
-
-        await transporter.sendMail(mailOptions);
+            `
+        });
 
         res.json({ message: 'Contraseña restablecida exitosamente' });
     } catch (error) {
